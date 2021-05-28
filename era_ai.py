@@ -14,6 +14,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import requests
 import json
+from decouple import config
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
@@ -192,8 +193,9 @@ def splitWords(query):
 
 
 def givenews():
+    news_api = config('News_API')
     speak("News for today..Lets begin")
-    url = "http://newsapi.org/v2/top-headlines?country=in&apiKey=cbdbe6b492824c9b837b508c4d0fdc92"
+    url = f"http://newsapi.org/v2/top-headlines?country=in&apiKey={news_api}"
     news = requests.get(url).text
     news_dict = json.loads(news)
     arts = news_dict['articles']
