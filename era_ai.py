@@ -33,18 +33,21 @@ def speak(audio):
 def wishMe():
     # Wish according to the time.
     hour = int(datetime.datetime.now().hour)
-    if hour >= 0 and hour < 12:
+    if 0 <= hour < 12:
         speak("Good Morning!")
-    elif hour >= 12 and hour < 18:
+    elif 12 <= hour < 18:
         speak("Good Afternoon!")
-    elif hour >= 18 and hour < 23:
+    elif 18 <= hour < 23:
         speak("Good Evening!")
     else:
-        speak("Good Night, sir...It's good for health to have dinner and go to bed now...as you know Early to bed and early to rise, makes a man healthy, wealthy and wise.")
+        speak(
+            "Good Night, sir...It's good for health to have dinner and go to bed now...as you know Early to bed and "
+            "early to rise, makes a man healthy, wealthy and wise.")
         speak("Thanks for using Era")
         exit()
-        
+
     speak("I'm Era, your personal voice assistant. Please tell how may I help you?")
+
 
 def sendEmail(to, content):
     # It sends an email
@@ -52,13 +55,12 @@ def sendEmail(to, content):
     server.ehlo()
     server.starttls()
     server.login('your_email@gmail.com',
-                 'your_password')    # Enter your password
+                 'your_password')  # Enter your password
     server.sendmail('your_email@gmail.com', to, content)
     server.close()
 
 
-def fetchNameEmail():
-    """Fetches name and their email ids from google contacts"""
+def fetchSecret():
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -78,7 +80,13 @@ def fetchNameEmail():
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
-    service = build('people', 'v1', credentials=creds)
+    return build('people', 'v1', credentials=creds)
+
+
+def fetchNameEmail():
+    """Fetches name and their email ids from google contacts"""
+    # Calls our function to retrieve our secret
+    service = fetchSecret()
 
     # Call the People API
     results = service.people().connections().list(
@@ -98,39 +106,19 @@ def fetchNameEmail():
             email = emails[0]['value']
             emailList.append(email)
     nameEmailList = zip(name1List, emailList)
-    sortedName1List = sorted(nameEmailList, key = lambda x: x[0]) 
-    return sortedName1List
-    
+    return sorted(nameEmailList, key=lambda x: x[0])
+
 
 def name1Lower(name1List):
     """Makes all the names lowercase for name-email id list"""
-    name1ListLowerSplit = []
-    name1ListLower = list(map(lambda x:x.lower(), name1List))
-    name1ListLowerSplit = list(map(lambda x: x.split(), name1ListLower))
-    return name1ListLowerSplit
+    name1ListLower = list(map(lambda x: x.lower(), name1List))
+    return list(map(lambda x: x.split(), name1ListLower))
+
 
 def fetchNamePhoneNo():
     """Fetches name and their phone numbers from google contacts"""
-    creds = None
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-
-    service = build('people', 'v1', credentials=creds)
+    # Calls our function to retrieve our secret
+    service = fetchSecret()
 
     # Call the People API
     results = service.people().connections().list(
@@ -151,22 +139,20 @@ def fetchNamePhoneNo():
             phone = phones[0]['value']
             phoneNoList.append(phone)
     namePhoneNoList = zip(name2List, phoneNoList)
-    sortedName2List = sorted(namePhoneNoList, key = lambda x: x[0])
-    return sortedName2List
+    return sorted(namePhoneNoList, key=lambda x: x[0])
+
 
 def name2Lower(name2List):
     """Makes all the names lowercase for name-phone number list"""
-    name2ListLowerSplit = []
-    name2ListLower = list(map(lambda x:x.lower(), name2List))
-    name2ListLowerSplit = list(map(lambda x: x.split(), name2ListLower))
-    return name2ListLowerSplit
+    name2ListLower = list(map(lambda x: x.lower(), name2List))
+    return list(map(lambda x: x.split(), name2ListLower))
+
 
 def queryLowerSplit(query):
     """Makes all the query elements lowercase"""
     queryLower = query.lower()
-    lst = []
-    lst = queryLower.split()
-    return lst
+    return queryLower.split()
+
 
 def takeCommand():
     # It takes microphone input from user and returns string output
@@ -176,7 +162,8 @@ def takeCommand():
         print("Listening...")
         r.adjust_for_ambient_noise(source)
         r.pause_threshold = 1
-        audio = r.listen(source, phrase_time_limit=4)  # it converts the audio input into string and gives a span of 4 sec to an user to speak
+        audio = r.listen(source,
+                         phrase_time_limit=4)  # it converts the audio input into string and gives a span of 4 sec to an user to speak
 
     try:
         print("Recognizing...")
@@ -188,8 +175,10 @@ def takeCommand():
         return "None"
     return query
 
-def splitWords(query):
-    return (lst[0].split())
+
+# Commenting out function since its not being used.
+# def splitWords(query):
+#     return lst[0].split()
 
 
 def givenews():
@@ -204,11 +193,11 @@ def givenews():
         speak(article['title'])
         print(f"\n{i}. {article['title']}")
         speak("Moving on to the next news....")
-        i+=1
+        i += 1
     for article in arts[-1:]:
-            speak(article['title'])
-            print(f"\n{i}. {article['title']}")
-            speak("Thanks for listening...")
+        speak(article['title'])
+        print(f"\n{i}. {article['title']}")
+        speak("Thanks for listening...")
     speak("Stay tuned for more updated news")
 
 
@@ -245,7 +234,7 @@ if __name__ == '__main__':
             music_dir = 'G:\\RabindraSangeet'
             songs = os.listdir(music_dir)
             os.startfile(os.path.join(
-                music_dir, songs[random.randint(0, len(songs)-1)]))
+                music_dir, songs[random.randint(0, len(songs) - 1)]))
         elif 'the time' in query or 'time' in query:
             strTime = datetime.datetime.now().strftime("%H:%M:%S")
             speak(f"Sir, the time is {strTime}")
@@ -274,14 +263,14 @@ if __name__ == '__main__':
             queryList = queryLowerSplit(query)
             i = 0
             for item in name1FinalList:
-                i+=1
+                i += 1
                 for item1 in item:
                     for item2 in queryList:
                         if item2 == item1:
                             try:
                                 speak("What is your message ?")
                                 content = takeCommand()
-                                to = emailList[i-1]
+                                to = emailList[i - 1]
                                 sendEmail(to, content)
                                 speak("Email has been sent")
                                 break
@@ -295,7 +284,7 @@ if __name__ == '__main__':
                 else:
                     continue
                 break
-            if i+1 > len(name1FinalList):
+            if i + 1 > len(name1FinalList):
                 speak("Contact not found")
 
         elif 'phone' in query or 'make call' in query or 'call' in query:
@@ -305,7 +294,7 @@ if __name__ == '__main__':
             queryList = queryLowerSplit(query)
             i = 0
             for item in name2FinalList:
-                i+=1
+                i += 1
                 for item1 in item:
                     for item2 in queryList:
                         if item2 == item1:
@@ -317,10 +306,10 @@ if __name__ == '__main__':
                                 client = Client(account_sid, auth_token)
 
                                 call = client.calls.create(
-                                                        twiml='<Response><Say>Ahoy, World!</Say></Response>',
-                                                        to = phoneNoList[i-1],
-                                                        from_='+1XXXXXXXXXX'
-                                                    )
+                                    twiml='<Response><Say>Ahoy, World!</Say></Response>',
+                                    to=phoneNoList[i - 1],
+                                    from_='+1XXXXXXXXXX'
+                                )
                                 speak("Calling has been initiated")
                                 break
                             except Exception as e:
@@ -333,7 +322,7 @@ if __name__ == '__main__':
                 else:
                     continue
                 break
-            if i+1 > len(name2FinalList):
+            if i + 1 > len(name2FinalList):
                 speak("Contact not found")
 
         elif 'headlines' in query or 'news' in query or 'headline' in query:
