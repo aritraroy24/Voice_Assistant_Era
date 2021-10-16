@@ -16,6 +16,8 @@ import requests
 import json
 from decouple import config
 
+import gui
+
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
@@ -25,6 +27,7 @@ SCOPES = ['https://www.googleapis.com/auth/contacts.readonly']
 
 
 def speak(audio):
+    gui.speak(audio)  # Display the message in GUI.
     # It speaks a given string
     engine.say(audio)
     engine.runAndWait()
@@ -203,7 +206,7 @@ def givenews():
 
 if __name__ == '__main__':
     wishMe()
-    while True:
+    def run_voice_assistant_era():
         # if 1:
         query = takeCommand().lower()
 
@@ -327,3 +330,5 @@ if __name__ == '__main__':
 
         elif 'headlines' in query or 'news' in query or 'headline' in query:
             givenews()
+    gui.set_speak_command(run_voice_assistant_era)
+    gui.mainloop()
